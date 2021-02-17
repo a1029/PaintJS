@@ -1,20 +1,30 @@
 const canvas = document.getElementById("jsCanvas");
 const ctx = canvas.getContext('2d');
+const colors = document.getElementsByClassName("jsColor");
+const range = document.getElementById("jsRange");
+const mode = document.getElementById("jsMode");
+
+const INITIAL_VALUE = "#2c2c2c";
+
+let painting = false;
+let filing = false;
 
 canvas.width = document.getElementsByClassName("canvas")[0].offsetWidth;
 canvas.height = document.getElementsByClassName("canvas")[0].offsetHeight;
 
-ctx.strokeStyle = "#2c2c2c";
+ctx.strokeStyle = INITIAL_VALUE;
+ctx.fillStyle = INITIAL_VALUE;
 ctx.lineWidth = 2.5;
 
-let painting = false;
 
 function stopPainting(){
     painting = false;
 }
 
 function startPainting(){
-    painting = true;
+    if(filing===false){
+        painting = true;
+    }
 }
 
 function onMouseMove(event){
@@ -29,10 +39,49 @@ function onMouseMove(event){
     }
 }
 
+function handleColorClick(event){
+    ctx.strokeStyle = event.target.style.backgroundColor;
+    ctx.fillStyle = ctx.strokeStyle;
+}
+
+function handleRangeChange(event){
+    ctx.lineWidth = event.target.value;
+}
+
+function handleModeClick(event){
+    if(filing === true){
+        filing = false;
+        mode.innerText = "Fill";
+    } else {
+        filing = true;
+        mode.innerText = "Paint";
+    }
+}
+
+function handleCanvasClick(){
+    if(filing){
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+}
 
 if (canvas){
     canvas.addEventListener("mousemove", onMouseMove);
     canvas.addEventListener("mousedown", startPainting);
     canvas.addEventListener("mouseup", stopPainting);
     canvas.addEventListener("mouseleave", stopPainting);
+    canvas.addEventListener("click", handleCanvasClick);
 }
+
+// change color
+Array.from(colors).forEach(color => color.addEventListener("click", handleColorClick));
+
+// change thickness
+if (range){
+    range.addEventListener("input", handleRangeChange);
+}
+
+// fill canvas
+if (mode){
+    mode.addEventListener("click", handleModeClick);
+}
+
